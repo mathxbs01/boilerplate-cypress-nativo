@@ -1,0 +1,38 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  secureFileName: 'dix-collection.json'
+
+steps:
+
+# 1. Baixar o arquivo do Secure Files
+- task: DownloadSecureFile@1
+  name: DownloadDixCollection
+  inputs:
+    secureFile: '$(secureFileName)'
+
+# 2. Ler o conteúdo do JSON (usando PowerShell Core, compatível com Linux/macOS/Windows)
+- task: PowerShell@2
+  displayName: 'Ler conteúdo do JSON'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $filePath = "$(DownloadDixCollection.secureFilePath)"
+      Write-Host "🔍 Lendo conteúdo de: $filePath"
+
+      $jsonContent = Get-Content $filePath -Raw | ConvertFrom-Json
+      Write-Host "📝 UID da DIX:"
+      $dix = $jsonContent.collections | Where-Object { $_.name -eq 'DIX' -and $_.owner -eq '21959170' }
+      Write-Host $dix.uid
+
+# (Opcional) Exportar o UID para uso posterior
+      Write-Host "##vso[task.setvariable variable=dixUid]$($dix.uid)"
+
+# 3. (Opcional) Usar a variável em outro passo
+- script: |
+    echo "UID da DIX (exportado): $(dixUid)"
+  displayName: 'Usar variável UID exportada'

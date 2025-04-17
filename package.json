@@ -1,0 +1,32 @@
+{
+  "name": "boilerplate-cypress",
+  "version": "1.0.0",
+  "description": "Boilerplate projeto.",
+  "main": "index.js",
+  "author": "Matheus Batista dos Santos",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "cypress": "^13.16.1",
+    "cypress-plugin-tab": "^1.0.5",
+    "dayjs": "^1.11.9",
+    "fs": "^0.0.1-security",
+    "mocha-junit-reporter": "^2.2.1",
+    "moment": "^2.29.4",
+    "report": "^0.1.1",
+    "tedious": "^16.4.0"
+  },
+  "scripts": {
+    "test:FULL:dev": "npx cypress run --browser edge --reporter junit",
+    "test:local": "npx cypress open",
+    "test:parallel": "concurrently \"npm run test:login\" \"npm run test:esqueciSenha\"",
+    "test:esqueciSenha": "npx cypress run --browser edge --spec \"cypress/stepsDefinitions/esqueciSenha.step.ts\"",
+    "test:login": "npx cypress run --browser edge --spec \"cypress/stepsDefinitions/login.step.ts\""
+  },
+  "devDependencies": {
+    "@cypress/browserify-preprocessor": "^3.0.2",
+    "@types/node": "^22.10.1",
+    "cypress-sql-server": "^1.0.0",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,79 @@
+parameters:
+- name: features
+  displayName: 'Parâmetro de Execução'
+  type: string
+  default: FULL:dev
+  values:
+  - esqueciSenha
+  - login
+  
+stages:
+- stage: __default
+  jobs:
+  - job: BuildAndTest
+    displayName: 'Job de Build e Teste'
+    pool:
+      vmImage: windows-latest
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.9.0'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+      displayName: 'Instalando Dependências'
+
+    - script: |
+        npm run test:${{ parameters.features }}
+      displayName: 'Execução teste'
+      continueOnError: true
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+
+    - task: PublishTestResults@2
+      displayName: 'Geração relatório JUnit'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: |
+          $(System.DefaultWorkingDirectory)/Results/*.xml
+        searchFolder: '$(System.DefaultWorkingDirectory)/Results'
+        publishRunAttachments: true
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\screenshots" -Force
+          New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\videos" -Force
+      displayName: 'Criando pasta para armazenar screenshots e videos'
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          if (Test-Path -Path "$(System.DefaultWorkingDirectory)/cypress/screenshots") {
+              Copy-Item -Path "$(System.DefaultWorkingDirectory)/cypress/screenshots/*" -Destination "$(Build.ArtifactStagingDirectory)/screenshots" -Recurse
+          } else {
+              Write-Host "Não foram geradas screenshots."
+          }
+      displayName: 'Copiando screenshots'
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          if (Test-Path -Path "$(System.DefaultWorkingDirectory)/cypress/videos") {
+              Copy-Item -Path "$(System.DefaultWorkingDirectory)/cypress/videos/*" -Destination "$(Build.ArtifactStagingDirectory)/videos" -Recurse
+          } else {
+              Write-Host "Não foram gerados videos."
+          }
+      displayName: 'Copiando videos'
+
+    - publish: $(Build.ArtifactStagingDirectory)/screenshots
+      artifact: screenshots
+      displayName: 'Publicando screenshots copiadas'
+
+    - publish: $(Build.ArtifactStagingDirectory)/videos
+      artifact: Videos
+      displayName: 'Publicando videos copiados'
