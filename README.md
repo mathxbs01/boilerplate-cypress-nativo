@@ -1,113 +1,217 @@
-# BOILERPLATE CYPRESS:
+# Boilerplate Cypress Nativo
 
-Apenas um bodyplate para apenas clonar e adaptar conforme o projeto demandar.
+## 📋 Sobre o Projeto
 
+Este repositório é um boilerplate para automação de testes web com **Cypress**, usando uma arquitetura em camadas que favorece manutenção, reutilização e evolução dos testes.
 
-# Pré requisitos:
+O projeto está organizado para separar responsabilidades entre: definições de fluxo, objetos de página, dados de teste e suporte de comandos e serviços.
 
-- Interface para linha de comando (Windows Terminal, Cmder, etc.)
-    https://cmder.app
+---
 
-- Java 8 ou superior.
-    https://www.java.com/pt-BR/download/
-    
-- Git for Windows -  Versão: 2.33.1 ou superior
-    https://gitforwindows.org
-    
-- Interface para escrita de código (Visual Studio Code)
-    https://code.visualstudio.com
-    
-- Node.js - Versão: 19.6.1 ou versão LTS
-    https://nodejs.org/pt-br/download
+## 🏗️ Arquitetura do Projeto
 
+### Estrutura de Pastas
 
-# Execução da Cypess:
-
-Após clonar o repositório na sua máquina local, basta acessar a pasta em que o arquivo tenha sido clonado e executar o seguinte comando:
 ```
+boilerplate-cypress-nativo/
+├── cypress/
+│   ├── fixtures/                     # Dados e massas de teste
+│   │   └── acessos/                  # Exemplo de fixtures por área
+│   │       └── acesso.json
+│   ├── pages/                        # Page Objects e elementos
+│   │   ├── esqueciSenhaPage/
+│   │   │   ├── esqueciSenha.page.elements.ts
+│   │   │   └── esqueciSenha.page.ts
+│   │   └── loginPage/
+│   │       ├── login.page.elements.ts
+│   │       └── login.page.ts
+│   ├── stepsDefinitions/             # Definições de testes / spec files
+│   │   ├── esqueciSenha.step.ts
+│   │   ├── login.step.ts
+│   │   └── common/                   # Passos reutilizáveis
+│   │       ├── escrita.step.ts
+│   │       ├── leitura.step.ts
+│   │       └── navegacao.step.ts
+│   └── supports/                     # Suporte da suíte Cypress
+│       ├── @cypress__browserify-preprocessor.d.ts
+│       ├── e2e.ts
+│       ├── index.d.ts
+│       ├── types.d.ts
+│       ├── commands/                 # Comandos personalizados
+│       │   ├── db/
+│       │   │   └── db.command.ts
+│       │   ├── elements/
+│       │   ├── spec/
+│       │   └── token/
+│       ├── models/                   # Modelos e tipagens
+│       └── services/                 # Serviços HTTP e de login
+├── cypress.config.ts                 # Configuração do Cypress
+├── cypress.env.json                  # Variáveis de ambiente do Cypress
+├── package.json                      # Dependências e scripts
+└── README.md                         # Documentação do projeto
+```
+
+### Camadas da Arquitetura
+
+#### 1. **Camada de Testes** (`cypress/stepsDefinitions/`)
+- Contém os arquivos de especificação que executam os fluxos de teste.
+- Cada arquivo `.step.ts` representa um cenário ou conjunto de cenários.
+- Usa steps reutilizáveis em `cypress/stepsDefinitions/common/` para escrita, leitura e navegação.
+- Exemplo: `cypress/stepsDefinitions/login.step.ts`
+
+#### 2. **Camada de Page Objects** (`cypress/pages/`)
+- Define a interação com a interface do usuário.
+- Divide ações e seletores em arquivos separados:
+  - `*.page.ts` para ações e métodos
+  - `*.page.elements.ts` para localizadores e tipagem
+- Exemplo: `cypress/pages/loginPage/login.page.ts`
+
+#### 3. **Camada de Dados** (`cypress/fixtures/`)
+- Armazena dados de teste, payloads e massas de dados em JSON.
+- Ajuda a manter os testes independentes de valores fixos no código.
+- Exemplo: `cypress/fixtures/acessos/acesso.json`
+
+#### 4. **Camada de Suporte** (`cypress/supports/`)
+- Contém configurações globais, comandos customizados e integrações com plugins.
+- `cypress/supports/e2e.ts` inicializa o suporte do Cypress.
+- `cypress/supports/commands/` registra comandos reutilizáveis.
+- `cypress/supports/services/` contém serviços para chamadas HTTP e autenticação.
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js 16+ instalado
+- `npm install` executado no diretório do projeto
+
+### Instalar dependências
+
+```bash
 npm install
 ```
 
-Ao final, para executar o cypress visualmente, basta executar o comando:
-```
+### Executar Cypress em modo GUI
+
+```bash
 npm run test:local
 ```
 
-Para execução CLI no ambiente de desenvolvimento, basta executar o comando:
-```
+### Executar testes em CLI
+
+```bash
 npm run test:FULL:dev
 ```
 
-Para geração do relatório HTML cucumber:
-```
-npm run report-cucumber
-```
+### Executar testes específicos
 
-# Relatório:
-
-Para reporte dos testes que foram executados, será utilizado o cucumber-report para elaboração visual, onde será gerado o documento index.html através do comando:
-```
-node cucumber-html-report.js
-	ou
-npm run report-cucumber
-```
-E para o reporte dos testes CI, será utilizado as tasks “PublishCucumberReport@1” e “PublishTestResults@2”. 
-A task PublishCucumberReport@1 criará um reporte simples, porém com a mesma base do Cucumber-report.
-A task PublishTestResults@2 criará um reporte mais detalhado, contendo alguma informações para métrica dos teste em conjunto com Azure TestPlan.# bodyplate-cypress
-
-# Documentação:
-
-Cypress Test Automation Project
-
-## Visão :
-
-Este projeto utiliza Cypress como ferramenta principal para automação de testes, implementando padrões arquiteturais baseados no conceito de Page Objects (PO) e Behavior Driven Development (BDD). Ele é projetado para proporcionar reaproveitamento, manutenção facilitada e padronização na escrita e execução de testes automatizados.
-
-## Estrutura do Projeto:
-1. Step Definitions
-- Cada página é necessário adicionar ao stepDefinitions para execução.
-- Dividido em três categorias (common):
-    - Escrita: Cadastro, edição ou exclusão.
-    - Leitura: Consulta e mensagens de resposta.
-    - Navegação: Mudanças de página.
-
-2. Pages
-- Implementação de ações e elementos de cada página.
-- Dividido em:
-    - Ações das Páginas: Escrever em campos, clicar em botões, etc.
-    - Elementos das Páginas: Tipagem e seleção de elementos DOM.
-
-3. Fixtures
-- Armazena payloads e dados sensíveis para utilização nos testes.
-- Organizado por telas/pages.
-
-4. Supports
-a) Commands
-- Cria comandos personalizados usando Cypress.Commands.
-- Exemplo:
-``` 
-cy.buscarBotaoPorTexto('Enviar').
+```bash
+npm run test:login
+npm run test:esqueciSenha
 ```
 
-b) Models
-- Responsável pela tipagem e mapeamento das páginas.
-- Exemplo: 
+### Executar testes em paralelo
+
+```bash
+npm run test:parallel
 ```
-PageModel.getPage('Login').
+
+---
+
+## 📘 Configuração do Cypress
+
+O arquivo `cypress.config.ts` já contém:
+- `specPattern` apontando para `cypress/stepsDefinitions/*.step.ts`
+- `reporter: 'junit'`
+- `reporterOptions` para saída XML e attachments
+- plugin `cypress-sql-server` para executar tarefas de banco
+- `supportFile: 'cypress/supports/e2e.ts'`
+
+---
+
+## 📝 Como Adicionar uma Nova Feature
+
+Para incluir uma nova feature no projeto, siga este fluxo:
+
+### 1. Criar o Page Object
+
+**Arquivo:** `cypress/pages/<nomeDaFeature>/<nomeDaFeature>.page.ts`
+
+- Implemente métodos para ações de UI
+- Use seletores definidos em `*.page.elements.ts`
+
+**Arquivo:** `cypress/pages/<nomeDaFeature>/<nomeDaFeature>.page.elements.ts`
+
+- Defina os seletores e valores necessários
+- Separe leitura de elementos da lógica de interação
+
+### 2. Criar a Spec de Teste
+
+**Arquivo:** `cypress/stepsDefinitions/<nomeDaFeature>.step.ts`
+
+```ts
+import { loginPage } from '../pages/loginPage/login.page';
+import { nomeDaFeaturePage } from '../pages/nomeDaFeature/nomeDaFeature.page';
+
+describe('Feature: Meu Novo Fluxo', () => {
+  it('Deve executar o novo fluxo com sucesso', () => {
+    loginPage.acessarLogin();
+    nomeDaFeaturePage.realizarAcao();
+    // validações
+  });
+});
 ```
 
-c) Services
-- Realiza chamadas REST APIs para testes de contratos ou geração de massas de dados.
+> Se o fluxo compartilhar passos comuns, aproveite os arquivos em `cypress/stepsDefinitions/common/`.
 
-# Passo-a-Passo para Criar Testes:
+### 3. Adicionar dados de teste
 
-- Criar arquivo .feature:
-    - Escreva os cenários utilizando Gherkin.
-- Adicionar classe Page:
-    - Crie a classe .page.ts e implemente a interface IPageModel.
-    - Inclua os elementos em .page.elements.ts.
-- Atualizar FuncionalidadeType:
-    - Adicione o nome da funcionalidade no arquivo FuncionalidadeType.model.ts.
-- Criar Step Definitions:
-    - Implemente os passos correspondentes aos cenários da feature.
-    - Verifique se o passo já existe antes de criar.
+**Arquivo:** `cypress/fixtures/<nomeDaFeature>/dados.json`
+
+- Use fixtures para separar dados do código
+- Carregue com `cy.fixture()` nos testes
+
+### 4. Registrar o script no `package.json` (opcional)
+
+```json
+{
+  "scripts": {
+    "test:meu-novo-fluxo": "npx cypress run --browser edge --spec \"cypress/stepsDefinitions/meuNovoFluxo.step.ts\""
+  }
+}
+```
+
+### 5. Executar o novo script
+
+```bash
+npm run test:meu-novo-fluxo
+```
+
+---
+
+## 📊 Relatórios e Saída
+
+O projeto usa o reporter JUnit configurado em `cypress.config.ts`.
+
+- Os resultados de execução são gerados no formato XML
+- Capturas e anexos podem ser salvos em `./cypress/screenshots`
+- Você pode integrar esses arquivos ao Azure DevOps ou outro pipeline de CI
+
+---
+
+## 🔍 Boas Práticas
+
+- Use nomes de arquivos e pastas descritivos
+- Separe seletores (`*.page.elements.ts`) da lógica de fluxo (`*.page.ts`)
+- Reutilize comandos em `cypress/supports/commands/`
+- Armazene dados em `cypress/fixtures/`
+- Mantenha testes curtos e fáceis de entender
+
+---
+
+## 🎯 Próximos Passos
+
+- Adicionar mais cenários para cada fluxo crítico
+- Criar novos Page Objects para novas páginas de aplicação
+- Expandir fixtures para cobrir mais combinações de dados
+- Integrar com pipeline CI/CD usando os relatórios JUnit
